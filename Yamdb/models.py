@@ -1,9 +1,12 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from pytils.translit import slugify
 
+User = get_user_model()
+
 
 class Categories(models.Model):
-    category_name = models.CharField(
+    name = models.CharField(
         'Категории',
         max_length=200,
         blank=False,
@@ -50,19 +53,15 @@ class Genres(models.Model):
 
 
 class Titles(models.Model):
-    title = models.CharField(
+    name = models.CharField(
         max_length=200,
         help_text='Название произведения',
-        on_delete=models.CASCADE,
         primary_key=True,
+        blank=False,
+        null=False,
     )
-    category_name = models.ForeignKey(
-        Categories,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='category_name',
-    )
+    year = models.IntegerField()
+    description = models.TextField(help_text='описание')
     genre = models.ForeignKey(
         Genres,
         on_delete=models.SET_NULL,
@@ -70,11 +69,16 @@ class Titles(models.Model):
         null=True,
         related_name='genre_name',
     )
-
-    genres = models.ManyToManyField(Genres)
+    category = models.ForeignKey(
+        Categories,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='category_name',
+    )
 
     class Meta:
-        ordering = ['title']
+        ordering = ['name']
 
     def __str__(self):
-        return self.title
+        return self.name
