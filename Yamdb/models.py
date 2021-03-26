@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from pytils.translit import slugify
 
@@ -23,11 +24,11 @@ class Categories(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.category_name)[:100]
+            self.slug = slugify(self.name)[:100]
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.category_name
+        return self.name
 
 
 class Genres(models.Model):
@@ -55,30 +56,34 @@ class Genres(models.Model):
 class Titles(models.Model):
     name = models.CharField(
         max_length=200,
-        help_text='Название произведения',
         primary_key=True,
         blank=False,
         null=False,
+        help_text='Напишите название произведения',
     )
     year = models.IntegerField()
     description = models.TextField(help_text='описание')
-    genre = models.ForeignKey(
-        Genres,
-        on_delete=models.SET_NULL,
+    rating = models.SmallIntegerField(
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(10),
+        ],
         blank=True,
         null=True,
-        related_name='genre_name',
+    )
+    genre = models.ManyToManyField(
+        Genres,
+        blank=True,
+        related_name='genre_title',
     )
     category = models.ForeignKey(
         Categories,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='category_name',
+        related_name='category_title',
+        db_index=False,
     )
-
-    class Meta:
-        ordering = ['name']
 
     def __str__(self):
         return self.name

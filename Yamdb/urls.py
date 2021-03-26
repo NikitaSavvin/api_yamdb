@@ -8,7 +8,6 @@ from .views import CategoriesViewSet, GenresViewSet, TitlesViewSet
 router = DefaultRouter()
 router.register('categories', CategoriesViewSet, basename='v1_categories')
 router.register('genres', GenresViewSet, basename='v1_genres')
-router.register(r'^genres/(?P<slug>[A-Za-z0-9_]+)', GenresViewSet)
 router.register('titles', TitlesViewSet, basename='v1_titles')
 
 urlpatterns = [
