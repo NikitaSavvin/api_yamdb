@@ -22,6 +22,9 @@ class Categories(models.Model):
             'латиницу, цифры, дефисы и знаки подчёркивания'),
     )
 
+    class Meta:
+        ordering = ['name', ]
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)[:100]
@@ -43,6 +46,9 @@ class Genres(models.Model):
         help_text=('Укажите адрес для страницы группы. Используйте только'
                    'латиницу, цифры, дефисы и знаки подчёркивания'),
     )
+
+    class Meta:
+        ordering = ['genre', ]
 
     def save(self, *args, **kwargs):
         if not self.slug:

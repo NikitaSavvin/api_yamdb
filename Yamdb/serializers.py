@@ -3,24 +3,13 @@ from .models import Categories, Genres, Titles
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Categories.objects.all()
-    )
-
     class Meta:
-        fields = '__all__'
+        fields = ['name', 'slug']
         model = Categories
         lookup_field = 'slug'
 
 
 class GenresSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugRelatedField(
-        many=True,
-        slug_field='slug',
-        queryset=Genres.objects.all()
-    )
-
     class Meta:
         fields = '__all__'
         model = Genres
