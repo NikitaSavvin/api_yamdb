@@ -62,13 +62,11 @@ class Genres(models.Model):
 class Titles(models.Model):
     name = models.CharField(
         max_length=200,
-        primary_key=True,
         blank=False,
-        null=False,
         help_text='Напишите название произведения',
     )
     year = models.IntegerField()
-    description = models.TextField(help_text='описание')
+    description = models.TextField(help_text='описание', null=True)
     rating = models.SmallIntegerField(
         validators=[
             MinValueValidator(0),
@@ -90,6 +88,9 @@ class Titles(models.Model):
         related_name='category_title',
         db_index=False,
     )
+
+    class Meta:
+        ordering = ['id', ]
 
     def __str__(self):
         return self.name
