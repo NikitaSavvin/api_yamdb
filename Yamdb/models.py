@@ -35,7 +35,7 @@ class Categories(models.Model):
 
 
 class Genres(models.Model):
-    genre = models.CharField(
+    name = models.CharField(
         max_length=200,
         help_text='Напишите название жанра'
     )
@@ -48,15 +48,15 @@ class Genres(models.Model):
     )
 
     class Meta:
-        ordering = ['genre', ]
+        ordering = ['name', ]
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.genre)[:100]
+            self.slug = slugify(self.name)[:100]
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.genre
+        return self.name
 
 
 class Titles(models.Model):
@@ -67,14 +67,6 @@ class Titles(models.Model):
     )
     year = models.IntegerField()
     description = models.TextField(help_text='описание', null=True)
-    rating = models.SmallIntegerField(
-        validators=[
-            MinValueValidator(0),
-            MaxValueValidator(10),
-        ],
-        blank=True,
-        null=True,
-    )
     genre = models.ManyToManyField(
         Genres,
         blank=True,

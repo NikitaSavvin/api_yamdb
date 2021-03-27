@@ -22,15 +22,15 @@ class GenresViewSet(ListCreateDestroyMixin):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['genre']
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', ]
     lookup_field = 'slug'
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['category', 'genre', 'name', 'year']
     lookup_field = 'slug'
