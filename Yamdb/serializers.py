@@ -1,4 +1,3 @@
-from django.db.models import F, Avg
 from rest_framework import serializers
 from .models import Categories, Genres, Titles
 
@@ -16,21 +15,28 @@ class GenresSerializer(serializers.ModelSerializer):
         model = Genres
 
 
+class GenreField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        return GenresSerializer(value).data
+
+
+class CategoryField(serializers.SlugRelatedField):
+    def to_representation(self, value):
+        return CategoriesSerializer(value).data
+
+
 class TitlesSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(
+    genre = GenreField(
         many=True,
         slug_field='slug',
         queryset=Genres.objects.all()
     )
-    category = serializers.SlugRelatedField(
+    category = CategoryField(
         slug_field='slug',
         queryset=Categories.objects.all()
     )
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(read_only=True, required=False)
 
     class Meta:
         fields = '__all__'
         model = Titles
-
-    def get_rating(self, obj):
-        return obj.reviews.aggregate(avgs=Avg(F('score'))).get('avgs', None)

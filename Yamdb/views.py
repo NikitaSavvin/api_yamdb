@@ -2,6 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+from .filter import TitleFilter
 from .models import Titles, Genres, Categories
 from .mixins import ListCreateDestroyMixin
 from .permissions import IsAdminOrReadOnly
@@ -32,5 +33,6 @@ class TitlesViewSet(viewsets.ModelViewSet):
     serializer_class = TitlesSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['category', 'genre', 'name', 'year']
-    lookup_field = 'slug'
+    filterset_class = TitleFilter
+    #search_fields = ['category', ]
+    #lookup_field = 'slug'
