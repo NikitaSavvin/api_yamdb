@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Categories, Genres, Titles
-
+from django.db.models import Avg
 
 class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,3 +40,44 @@ class TitlesSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Titles
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        many=False,
+        read_only=True,
+        slug_field='username'
+    )
+    title = serializers.SlugRelatedField(
+        many=False,
+        read_only=True,
+        slug_field='id'
+    )
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = '__all__'
+        model = Review
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique_object_user',
+            ),
+            models.CheckConstraint(
+                name='unique_object_author',
+                check=~models.Q(user=models.F('author')),
+            ),
+        ]
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        many=False,
+        read_only=True,
+        slug_field='username'
+    )
+
+    class Meta:
+        read_only_fields = ('review',)
+        fields = '__all__'
+        model = Comment
