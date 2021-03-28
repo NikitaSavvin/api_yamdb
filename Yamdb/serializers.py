@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from .models import Categories, Genres, Titles
 from django.db.models import Avg
+from rest_framework.validators import UniqueTogetherValidator
+
+from users.models import CustomUser
+
 
 class CategoriesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,3 +85,15 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('review',)
         fields = '__all__'
         model = Comment
+
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('first_name', 'last_name', 'username',  'email', 'bio', 'role', )
+        model = CustomUser
+
+        validators = [UniqueTogetherValidator(
+            queryset=CustomUser.objects.all(),
+            fields=['email',])]
