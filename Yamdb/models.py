@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from pytils.translit import slugify
+from users.models import CustomUser
 
 User = get_user_model()
 
@@ -80,7 +81,6 @@ class Titles(models.Model):
         related_name='category_title',
         db_index=False,
     )
-    rating = serializers.FloatField()
     
     class Meta:
         ordering = ['id', ]
@@ -92,12 +92,12 @@ class Titles(models.Model):
 class Review(models.Model):
     title = models.ForeignKey(Titles, on_delete=models.CASCADE, related_name='reviews')
     text = models.TextField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    #user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         'Дата публикации', auto_now_add=True
     )
     author = models.ForeignKey(
-        User, blank=True, null=True,
+        CustomUser, blank=True, null=True,
         on_delete=models.CASCADE,
         related_name='rev'
     )
@@ -112,7 +112,7 @@ class Review(models.Model):
 
 class Comment(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments'
+        CustomUser, on_delete=models.CASCADE, related_name='comments'
     )
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name='comments'
@@ -121,6 +121,8 @@ class Comment(models.Model):
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
-
+    pub_date = models.DateTimeField(
+        'Дата публикации', auto_now_add=True
+    )
     def __str__(self):
         return self.review_id

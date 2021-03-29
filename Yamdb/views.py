@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 from rest_framework.generics import get_object_or_404
@@ -10,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from .filter import TitleFilter
 from .models import Categories, Genres, Review, Titles, Titles
 from .mixins import ListCreateDestroyMixin
-from .permissions import IsAdminOrReadOnly, IsAdminOrSuperUser
+from .permissions import IsAdminOrReadOnly, IsAdminOrSuperUser, IsAuthorOrModerator
 from .serializers import (
     CategoriesSerializer,
     CommentSerializer,
@@ -18,6 +19,7 @@ from .serializers import (
     ReviewSerializer,
     TitlesSerializer,
     UserSerializer,
+    TitleGetSerializer_NoRating
 )
 from users.models import CustomUser
 from rest_framework.response import Response
@@ -43,12 +45,12 @@ class GenresViewSet(ListCreateDestroyMixin):
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    queryset = Titles.objects.all().annotate(rating=Avg('reviews__score'))
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
             serializer_class = TitlesSerializer # с полем rating
         else:
-            serializer_class = TitlesSerializer
+            serializer_class = TitleGetSerializer_NoRating
         return serializer_class 
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]
@@ -59,7 +61,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrModerator,]
 
     def perform_create(self, serializer):
         data = {
@@ -79,7 +81,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAuthorOrModerator,]
 
     def perform_create(self, serializer):
         data = {
