@@ -1,12 +1,12 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class CustomUser(AbstractUser):
     class CustomUserRole(models.TextChoices):
         admin = 'admin'
         user = 'user'
-        moderator ='moderator'
+        moderator = 'moderator'
 
     bio = models.TextField(max_length=500, blank=True, null=True)
     role = models.CharField(('User_status'), max_length=20,

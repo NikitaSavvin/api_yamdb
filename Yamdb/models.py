@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from pytils.translit import slugify
+
 from users.models import CustomUser
 
 User = get_user_model()
@@ -81,7 +82,7 @@ class Titles(models.Model):
         related_name='category_title',
         db_index=False,
     )
-    
+
     class Meta:
         ordering = ['id', ]
 
@@ -90,9 +91,12 @@ class Titles(models.Model):
 
 
 class Review(models.Model):
-    title = models.ForeignKey(Titles, on_delete=models.CASCADE, related_name='reviews')
+    title = models.ForeignKey(
+        Titles,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
     text = models.TextField()
-    #user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         'Дата публикации', auto_now_add=True
     )
@@ -124,5 +128,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации', auto_now_add=True
     )
+
     def __str__(self):
         return self.review_id
