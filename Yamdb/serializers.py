@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from users.models import CustomUser
 
@@ -97,6 +96,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
+    role = serializers.CharField(default=CustomUser.CustomUserRole.user)
+
     class Meta:
         fields = (
             'first_name',
@@ -105,9 +106,10 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'bio',
             'role',
+            'confirmation_code',
         )
         model = CustomUser
 
-        validators = [UniqueTogetherValidator(
-            queryset=CustomUser.objects.all(),
-            fields=['email'])]
+        extra_kwargs = {'confirmation_code': {'write_only': True},
+                        'username': {'required': True},
+                        'email': {'required': True}}
