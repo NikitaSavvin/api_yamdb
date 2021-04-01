@@ -5,6 +5,7 @@ from .utils import generate_confirmation_code
 
 
 class CustomUser(AbstractUser):
+
     class CustomUserRole(models.TextChoices):
         admin = 'admin'
         user = 'user'
