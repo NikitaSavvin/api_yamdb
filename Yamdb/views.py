@@ -20,7 +20,7 @@ from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
                           IsAuthorOrStaffOrReadOnly)
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           GenresSerializer, ReviewSerializer,
-                          TitleGetSerializer_NoRating, TitlesSerializer,
+                          TitlesWriteSerializer, TitlesReadSerializer,
                           UserSerializer)
 
 BASE_USERNAME = 'CustomUser'
@@ -29,7 +29,7 @@ BASE_USERNAME = 'CustomUser'
 class CategoriesViewSet(ListCreateDestroyMixin):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -38,7 +38,7 @@ class CategoriesViewSet(ListCreateDestroyMixin):
 class GenresViewSet(ListCreateDestroyMixin):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
     lookup_field = 'slug'
@@ -48,12 +48,11 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all().annotate(rating=Avg('reviews__score'))
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
-            serializer_class = TitlesSerializer
+        if self.request.method.lower() == 'get':
+            return TitlesReadSerializer
         else:
-            serializer_class = TitleGetSerializer_NoRating
-        return serializer_class
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
+            return TitlesWriteSerializer
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
 
