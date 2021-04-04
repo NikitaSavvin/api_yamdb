@@ -10,30 +10,31 @@ User = get_user_model()
 
 class Categories(models.Model):
     name = models.CharField(
-        'Категории',
+        'Категория',
         max_length=200,
         blank=False,
         null=False,
+        help_text='Укажите назване категории'
     )
     slug = models.SlugField(
-        'Адрес страници категории',
+        'Адрес страницы категории',
         max_length=200,
         unique=True,
         help_text=(
             'Укажите адрес для страницы группы. Используйте только'
-            'латиницу, цифры, дефисы и знаки подчёркивания'),
+            ' латиницу, цифры, дефисы и знаки подчёркивания.'),
     )
 
     class Meta:
         ordering = ['name', ]
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)[:100]
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
 
 
 class Genres(models.Model):
@@ -46,33 +47,37 @@ class Genres(models.Model):
         max_length=200,
         unique=True,
         help_text=('Укажите адрес для страницы группы. Используйте только'
-                   'латиницу, цифры, дефисы и знаки подчёркивания'),
+                   ' латиницу, цифры, дефисы и знаки подчёркивания.'),
     )
 
     class Meta:
         ordering = ['name', ]
+
+    def __str__(self):
+        return self.name
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)[:100]
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return self.name
-
 
 class Titles(models.Model):
     name = models.CharField(
+        'Название произведения',
         max_length=200,
         blank=False,
         help_text='Напишите название произведения',
     )
-    year = models.IntegerField()
-    description = models.TextField(help_text='описание', null=True)
+    year = models.PositiveSmallIntegerField(db_index=True)
+    description = models.TextField(
+        help_text='описание произведения',
+        null=True
+    )
     genre = models.ManyToManyField(
         Genres,
         blank=True,
-        related_name='genre_title',
+        related_name='title_genre',
     )
     category = models.ForeignKey(
         Categories,
@@ -87,7 +92,7 @@ class Titles(models.Model):
         ordering = ['id', ]
 
     def __str__(self):
-        return self.name
+        return self.name, self.description
 
 
 class Review(models.Model):
