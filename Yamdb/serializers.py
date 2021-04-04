@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from users.models import CustomUser
+from users.models import CustomUser, CustomUserRole
 
 from .models import Categories, Comment, Genres, Review, Titles
 
@@ -96,7 +96,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
-    role = serializers.CharField(default=CustomUser.CustomUserRole.user)
+    role = serializers.CharField(default=CustomUserRole.user)
 
     class Meta:
         fields = (
