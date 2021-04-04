@@ -6,8 +6,9 @@ from users.models import CustomUser
 class IsAdminOrReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        return (request.method == 'GET' or request.user.is_authenticated
-                and (request.user.role == CustomUser.CustomUserRole.admin
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated
+                and (request.user.role == request.user.is_admin
                      or request.user.is_superuser))
 
 
