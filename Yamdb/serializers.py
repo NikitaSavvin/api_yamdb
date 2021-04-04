@@ -20,8 +20,8 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class GenreField(serializers.SlugRelatedField):
-    def to_representation(self, value):
-        return GenresSerializer(value).data
+        def to_representation(self, value):
+            return GenresSerializer(value).data
 
 
 class CategoryField(serializers.SlugRelatedField):
@@ -30,12 +30,12 @@ class CategoryField(serializers.SlugRelatedField):
 
 
 class TitlesReadSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(
+    genre = GenreField(
         many=True,
         slug_field='slug',
         queryset=Genres.objects.all()
     )
-    category = serializers.SlugRelatedField(
+    category = CategoryField(
         slug_field='slug',
         queryset=Categories.objects.all()
     )
@@ -44,10 +44,6 @@ class TitlesReadSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Titles
-
-    def to_representation(self, instance):
-        serializer = super(TitlesReadSerializer, self).to_representation(instance)
-        return serializer
 
 
 class TitlesWriteSerializer(serializers.ModelSerializer):
