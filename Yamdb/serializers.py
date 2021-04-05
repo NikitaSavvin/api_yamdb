@@ -1,7 +1,7 @@
 from django.forms import model_to_dict
 from rest_framework import serializers
 
-from users.models import CustomUser
+from users.models import CustomUser, CustomUserRole
 
 from .models import Categories, Comment, Genres, Review, Titles
 
