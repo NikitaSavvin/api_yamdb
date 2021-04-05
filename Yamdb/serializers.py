@@ -1,7 +1,7 @@
 from django.forms import model_to_dict
 from rest_framework import serializers
 
-from users.models import CustomUser
+from users.models import CustomUser, CustomUserRole
 
 from .models import Categories, Comment, Genres, Review, Titles
 
@@ -20,8 +20,8 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class GenreField(serializers.SlugRelatedField):
-    def to_representation(self, value):
-        return GenresSerializer(value).data
+        def to_representation(self, value):
+            return GenresSerializer(value).data
 
 
 class CategoryField(serializers.SlugRelatedField):
@@ -41,7 +41,7 @@ class TitlesWriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Titles
 
-
+        
 class TitlesReadSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True)
     genre = GenresSerializer(many=True, read_only=True)
@@ -86,7 +86,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(default=CustomUser.CustomUserRole.user)
+    role = serializers.CharField(default=CustomUserRole.user)
 
     class Meta:
         fields = (

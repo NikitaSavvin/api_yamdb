@@ -1,7 +1,7 @@
 from django.db.models import Avg, Max
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import CustomUser
-from users.utils import generate_confirmation_code, send_mail_to_user
+from users.models import DEFAULT_UUID, CustomUser
+from users.utils import send_mail_to_user
 
 from .filter import TitleFilter
 from .mixins import ListCreateDestroyMixin
@@ -48,7 +48,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all().annotate(rating=Avg('reviews__score'))
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.request.method.lower() == 'get':
             return TitlesReadSerializer
         else:
             return TitlesWriteSerializer
@@ -126,7 +126,8 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
 
 
-class RegisterView(APIView):
+class RegisterView(generics.CreateAPIView,):
+
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -135,7 +136,7 @@ class RegisterView(APIView):
         if len(user) > 0:
             confirmation_code = user[0].confirmation_code
         else:
-            confirmation_code = generate_confirmation_code()
+            confirmation_code = DEFAULT_UUID
             max_id = CustomUser.objects.aggregate(Max('id'))['id__max'] + 1
             data = {'email': email, 'confirmation_code': confirmation_code,
                     'username': f'{BASE_USERNAME}{max_id}'}
