@@ -48,7 +48,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all().annotate(rating=Avg('reviews__score'))
 
     def get_serializer_class(self):
-        if self.request.method.lower() == 'get':
+        if self.request.method == 'GET':
             return TitlesReadSerializer
         else:
             return TitlesWriteSerializer
