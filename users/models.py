@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
         moderator = 'moderator'
 
     bio = models.TextField(max_length=500, blank=True, null=True)
-    role = models.CharField('User_status', max_length=20,
+    role = models.CharField(max_length=20,
                             choices=CustomUserRole.choices,
                             default=CustomUserRole.user)
     confirmation_code = models.CharField(max_length=100, null=True,
