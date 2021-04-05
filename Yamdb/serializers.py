@@ -96,7 +96,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(default=CustomUser.CustomUserRole.user)
+    role = serializers.CharField(default=CustomUserRole.user)
 
     class Meta:
         fields = (
