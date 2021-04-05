@@ -4,7 +4,6 @@ from users.models import CustomUserRole
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
-
     def has_permission(self, request, view):
                      or request.user.is_superuser))
 
