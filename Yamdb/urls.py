@@ -6,6 +6,7 @@ from .views import (CategoriesViewSet, CommentViewSet, GenresViewSet,
                     RegisterView, ReviewViewSet, TitlesViewSet, TokenView,
                     UserViewSet)
 
+v1_router_auth = DefaultRouter()
 v1_router = DefaultRouter()
 v1_router.register(r'users', UserViewSet, basename='users')
 v1_router.register('review', ReviewViewSet, basename='review')
@@ -24,12 +25,11 @@ v1_router.register(
 v1_router.register('categories', CategoriesViewSet, basename='v1_categories')
 v1_router.register('genres', GenresViewSet, basename='v1_genres')
 v1_router.register('titles', TitlesViewSet, basename='v1_titles')
+v1_router_auth.register('email', RegisterView.as_view(),)
+v1_router_auth.register('token', TokenView.as_view(), basename='v1_get_token')
+
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),
-    path('v1/auth/email/', RegisterView.as_view(),
-         name='get_confirmation_code'),
-    path('v1/auth/token/', TokenView.as_view(), name='get_token'),
-    path('v1/auth/token/refresh/', TokenRefreshView.as_view(),
-         name='token_refresh'),
+    path('v1/auth/' include(v1_router_auth.urls)),
 ]

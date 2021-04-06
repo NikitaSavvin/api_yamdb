@@ -1,5 +1,4 @@
 from django.db.models import Avg, Max
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
@@ -92,13 +91,19 @@ class CommentViewSet(viewsets.ModelViewSet):
         data = {
             'author': self.request.user,
             'review': get_object_or_404(
-                Review, pk=self.kwargs.get('review_id')
+                Review,
+                title__id=self.kwargs.get('title_id'),
+                id=self.kwargs.get('review_id')
             ),
         }
         serializer.save(**data)
 
     def get_queryset(self):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        review = get_object_or_404(
+            Review,
+            title__id=self.kwargs.get('title_id'),
+            id=self.kwargs.get('review_id')
+        )
         all_comments = review.comments.all()
         return all_comments
 

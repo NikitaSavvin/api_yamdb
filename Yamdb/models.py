@@ -110,11 +110,11 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='rev'
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         default=5,
         validators=[
-            MaxValueValidator(10),
-            MinValueValidator(1)
+            MaxValueValidator(10, 'Больше 10 поставить нельзя'),
+            MinValueValidator(1, 'Меньше 1 поставить нельзя')
         ],
     )
 
@@ -135,4 +135,4 @@ class Comment(models.Model):
     )
 
     def __str__(self):
-        return self.review_id
+        return f'{self.review} прокоментировал {self.author}'
