@@ -18,7 +18,7 @@ from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
                           IsAuthorOrStaffOrReadOnly)
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           GenresSerializer, ReviewSerializer,
-                          TitleGetSerializer_NoRating, TitlesSerializer,
+                          TitlesWriteSerializer, TitlesReadSerializer,
                           UserSerializer, EmailSerializer, TokenSerializer)
 from django.contrib.auth.tokens import default_token_generator
 
