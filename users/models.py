@@ -15,12 +15,16 @@ class CustomUserRole(models.TextChoices):
 class CustomUser(AbstractUser):
 
     bio = models.TextField(max_length=500, blank=True, null=True)
-    role = models.CharField(max_length=20,
-                            choices=CustomUserRole.choices,
-                            default=CustomUserRole.user)
-    confirmation_code = models.CharField(max_length=100, null=True,
-                                         verbose_name='Код подтверждения',
-                                         default=DEFAULT_UUID)
+    role = models.CharField(
+        max_length=20,
+        choices=CustomUserRole.choices,
+        default=CustomUserRole.user,
+    )
+    confirmation_code = models.CharField(
+        max_length=100, null=True,
+        verbose_name='Код подтверждения',
+        default=DEFAULT_UUID
+    )
     email = models.EmailField(max_length=255, unique=True,
                               blank=False, null=False)
 

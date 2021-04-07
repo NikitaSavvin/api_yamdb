@@ -1,7 +1,7 @@
 from django.forms import model_to_dict
 from rest_framework import serializers
 
-from users.models import CustomUser, CustomUserRole
+from users.models import CustomUser
 
 from .models import Categories, Comment, Genres, Review, Titles
 
@@ -87,8 +87,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(default=CustomUserRole.user)
-
     class Meta:
         fields = (
             'first_name',
@@ -104,3 +102,12 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'confirmation_code': {'write_only': True},
                         'username': {'required': True},
                         'email': {'required': True}}
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=50)
+
+
+class TokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    confirmation_code = serializers.CharField()
