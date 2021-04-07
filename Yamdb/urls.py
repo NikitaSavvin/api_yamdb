@@ -27,8 +27,4 @@ v1_router.register('titles', TitlesViewSet, basename='v1_titles')
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),
-    path('v1/auth/email/', RegisterView),
-    path('v1/auth/token/', GetTokenView),
-    path('v1/auth/token/refresh/', TokenRefreshView.as_view(),
-         name='token_refresh'),
 ]
