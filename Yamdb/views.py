@@ -1,3 +1,4 @@
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
@@ -20,7 +21,6 @@ from .serializers import (CategoriesSerializer, CommentSerializer,
                           GenresSerializer, ReviewSerializer,
                           TitlesWriteSerializer, TitlesReadSerializer,
                           UserSerializer, EmailSerializer, TokenSerializer)
-from django.contrib.auth.tokens import default_token_generator
 
 
 class CategoriesViewSet(ListCreateDestroyMixin):
