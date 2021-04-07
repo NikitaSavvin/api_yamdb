@@ -19,7 +19,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'users',
-    'Yamdb',
+    'yamdb',
 ]
 
 MIDDLEWARE = [
@@ -34,7 +34,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'api_yamdb.urls'
 
-TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

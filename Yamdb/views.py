@@ -18,9 +18,9 @@ from .models import Categories, Genres, Review, Titles
 from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
                           IsAuthorOrStaffOrReadOnly)
 from .serializers import (CategoriesSerializer, CommentSerializer,
-                          GenresSerializer, ReviewSerializer,
-                          TitlesWriteSerializer, TitlesReadSerializer,
-                          UserSerializer, EmailSerializer, TokenSerializer)
+                          EmailSerializer, GenresSerializer, ReviewSerializer,
+                          TitlesReadSerializer, TitlesWriteSerializer,
+                          TokenSerializer, UserSerializer)
 
 
 class CategoriesViewSet(ListCreateDestroyMixin):

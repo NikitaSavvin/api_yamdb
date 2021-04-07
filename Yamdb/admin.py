@@ -1,7 +1,5 @@
+from django.apps import apps
 from django.contrib import admin
-
-from .models import Comment, Review
-from users.models import CustomUser
 
 
 class ReviewAdmin(admin.ModelAdmin):
@@ -18,11 +16,40 @@ class CommentAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
+class TitlesAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk', 'name', 'year', 'genre',
+        'category', 'description',
+    )
+    search_fields = ('name',)
+    list_filter = ('name', 'year',)
+    empty_value_display = '-пусто-'
+
+
+class GenresAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name', 'slug',)
+    search_fields = ('name',)
+    list_filter = ('name', 'slug',)
+    empty_value_display = '-пусто-'
+
+
+class CategoriesAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name', 'slug',)
+    search_fields = ('name',)
+    list_filter = ('name', 'slug',)
+    empty_value_display = '-пусто-'
+
+
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'role',)
     list_filter = ('username',)
     empty_value_display = '-пусто-'
 
 
-admin.site.register(Review, ReviewAdmin)
-admin.site.register(Comment, CommentAdmin)
+models = apps.get_models()
+
+for model in models:
+    try:
+        admin.site.register(model)
+    except admin.sites.AlreadyRegistered:
+        pass

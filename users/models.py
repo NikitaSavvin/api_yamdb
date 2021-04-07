@@ -25,8 +25,10 @@ class CustomUser(AbstractUser):
         verbose_name='Код подтверждения',
         default=DEFAULT_UUID
     )
-    email = models.EmailField(max_length=255, unique=True,
-                              blank=False, null=False)
+    email = models.EmailField(
+        max_length=255, unique=True,
+        blank=False, null=False
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username',)
