@@ -25,8 +25,8 @@ v1_router.register(
 v1_router.register('categories', CategoriesViewSet, basename='v1_categories')
 v1_router.register('genres', GenresViewSet, basename='v1_genres')
 v1_router.register('titles', TitlesViewSet, basename='v1_titles')
-v1_router_auth.register('email', RegisterView.as_view(),)
-v1_router_auth.register('token', TokenView.as_view(), basename='v1_get_token')
+v1_router_auth.register('email', RegisterView)
+v1_router_auth.register('token', GetTokenView)
 
 
 urlpatterns = [
