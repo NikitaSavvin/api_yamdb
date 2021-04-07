@@ -1,16 +1,15 @@
-from django.db.models import Avg, Max
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, status, viewsets
-from rest_framework.decorators import action
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import DEFAULT_UUID, CustomUser
+from users.models import CustomUser
 from users.utils import send_mail_to_user
 
 from .filter import TitleFilter
@@ -21,9 +20,8 @@ from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           GenresSerializer, ReviewSerializer,
                           TitleGetSerializer_NoRating, TitlesSerializer,
-                          UserSerializer)
-
-BASE_USERNAME = 'CustomUser'
+                          UserSerializer, EmailSerializer, TokenSerializer)
+from django.contrib.auth.tokens import default_token_generator
 
 
 class CategoriesViewSet(ListCreateDestroyMixin):
@@ -116,49 +114,45 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def me(self, request):
-        user = get_object_or_404(CustomUser, username=request.user.username)
+        user = request.user
         if request.method == 'GET':
             serializer = UserSerializer(user)
             return Response(serializer.data)
         serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid() and user.username == request.user.username:
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=user.role, partial=True)
+        return Response(serializer.data)
 
 
-class RegisterView(generics.CreateAPIView,):
+@api_view(['POST'])
+@permission_classes([AllowAny, ])
+def RegisterView(request):
+    serializer = EmailSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    email = request.data.get('email')
+    user, create = CustomUser.objects.get_or_create(
+        email=serializer.validated_data.get('email'))
+    if create:
+        user.username = serializer.validated_data.get('email')
+        user.save()
+    token = default_token_generator.make_token(user)
+    email_to = email
+    message = f'Код подтверждения:{token}'
+    send_mail_to_user(email_to, message,)
+    return Response(
+        f'Код подтверждения будет отправлен вам на почту: {user.email}'
+    )
 
-    permission_classes = (AllowAny,)
 
-    def post(self, request):
-        email = request.data.get('email')
-        user = CustomUser.objects.filter(email=email)
-        if len(user) > 0:
-            confirmation_code = user[0].confirmation_code
-        else:
-            confirmation_code = DEFAULT_UUID
-            max_id = CustomUser.objects.aggregate(Max('id'))['id__max'] + 1
-            data = {'email': email, 'confirmation_code': confirmation_code,
-                    'username': f'{BASE_USERNAME}{max_id}'}
-            serializer = UserSerializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-        send_mail_to_user(email, confirmation_code)
-        return Response({'email': email, })
-
-
-class TokenView(APIView):
-    permission_classes = (AllowAny,)
-
-    def get_token(self, user):
-        refresh = RefreshToken.for_user(user)
-        return str(refresh.access_token)
-
-    def post(self, request):
-        user = get_object_or_404(CustomUser, email=request.data.get('email'))
-        if user.confirmation_code != request.data.get('confirmation_code'):
-            response = {'confirmation_code': 'Неверный код для данного email'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-        response = {'token': self.get_token(user)}
-        return Response(response, status=status.HTTP_200_OK)
+@api_view(['POST'],)
+@permission_classes([AllowAny, ])
+def GetTokenView(request):
+    serializer = TokenSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = get_object_or_404(CustomUser, email=serializer.validated_data.get(
+        'email'))
+    confirmation_code = serializer.validated_data.get('confirmation_code')
+    if default_token_generator.check_token(user, confirmation_code):
+        token = RefreshToken.for_user(user)
+        return Response({'Токен': f'{token.access_token}'})
+    return Response(status=status.HTTP_400_BAD_REQUEST)
