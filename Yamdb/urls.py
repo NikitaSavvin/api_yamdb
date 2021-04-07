@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     CategoriesViewSet, CommentViewSet, GenresViewSet,
-    GetTokenView, RegisterView, ReviewViewSet, 
+    GetTokenView, RegisterView, ReviewViewSet,
     TitlesViewSet, UserViewSet
 )
 
