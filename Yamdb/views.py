@@ -1,3 +1,4 @@
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status, viewsets
@@ -20,9 +21,7 @@ from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
 from .serializers import (CategoriesSerializer, CommentSerializer,
                           GenresSerializer, ReviewSerializer,
                           TitlesWriteSerializer, TitlesReadSerializer,
-                          UserSerializer)
-
-BASE_USERNAME = 'CustomUser'
+                          UserSerializer, EmailSerializer, TokenSerializer)
 
 
 class CategoriesViewSet(ListCreateDestroyMixin):
