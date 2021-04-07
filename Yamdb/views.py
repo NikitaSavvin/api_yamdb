@@ -4,8 +4,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (
+    AllowAny, IsAuthenticated,
+    IsAuthenticatedOrReadOnly
+)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -15,12 +17,15 @@ from users.utils import send_mail_to_user
 from .filter import TitleFilter
 from .mixins import ListCreateDestroyMixin
 from .models import Categories, Genres, Review, Titles
-from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
-                          IsAuthorOrStaffOrReadOnly)
-from .serializers import (CategoriesSerializer, CommentSerializer,
-                          EmailSerializer, GenresSerializer, ReviewSerializer,
-                          TitlesReadSerializer, TitlesWriteSerializer,
-                          TokenSerializer, UserSerializer)
+from .permissions import (
+    IsAdminOrReadOnly, IsAdminOrSuperUser, IsAuthorOrStaffOrReadOnly
+)
+from .serializers import (
+    CategoriesSerializer, CommentSerializer,
+    EmailSerializer, GenresSerializer, ReviewSerializer,
+    TitlesReadSerializer, TitlesWriteSerializer,
+    TokenSerializer, UserSerializer
+)
 
 
 class CategoriesViewSet(ListCreateDestroyMixin):
