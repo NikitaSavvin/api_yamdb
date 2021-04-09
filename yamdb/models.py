@@ -29,7 +29,7 @@ class Categories(models.Model):
 
     class Meta:
         ordering = ['name', ]
-        verbose_name_plural = 'Categories'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -57,7 +57,7 @@ class Genres(models.Model):
 
     class Meta:
         ordering = ['name', ]
-        verbose_name_plural = 'Genres'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.name
@@ -99,7 +99,7 @@ class Titles(models.Model):
 
     class Meta:
         ordering = ['id', ]
-        verbose_name_plural = 'Titles'
+        verbose_name_plural = 'Названия'
 
     def __str__(self):
         return self.name, self.description
@@ -128,6 +128,9 @@ class Review(models.Model):
         ],
     )
 
+    class Meta:
+        verbose_name_plural = 'Отзывы'
+
 
 class Comment(models.Model):
     author = models.ForeignKey(
@@ -143,6 +146,9 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации', auto_now_add=True
     )
+
+    class Meta:
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return f'{self.review} прокоментировал {self.author}'
