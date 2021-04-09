@@ -48,15 +48,15 @@ class GenresViewSet(ListCreateDestroyMixin):
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all().annotate(rating=Avg('reviews__score'))
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
             return TitlesReadSerializer
         else:
             return TitlesWriteSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = TitleFilter
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

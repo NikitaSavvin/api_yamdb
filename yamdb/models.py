@@ -4,6 +4,7 @@ from django.db import models
 from pytils.translit import slugify
 
 from users.models import CustomUser
+from .validators import validate_date
 
 User = get_user_model()
 
@@ -28,6 +29,7 @@ class Categories(models.Model):
 
     class Meta:
         ordering = ['name', ]
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.name
@@ -44,7 +46,7 @@ class Genres(models.Model):
         help_text='Напишите название жанра'
     )
     slug = models.SlugField(
-        'Адрес страници жанра',
+        'Адрес страницы жанра',
         max_length=200,
         unique=True,
         help_text=(
@@ -55,6 +57,7 @@ class Genres(models.Model):
 
     class Meta:
         ordering = ['name', ]
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.name
@@ -72,7 +75,10 @@ class Titles(models.Model):
         blank=False,
         help_text='Напишите название произведения',
     )
-    year = models.PositiveSmallIntegerField(db_index=True)
+    year = models.PositiveSmallIntegerField(
+        db_index=True,
+        validators=[validate_date]
+    )
     description = models.TextField(
         help_text='описание произведения',
         null=True
@@ -80,19 +86,20 @@ class Titles(models.Model):
     genre = models.ManyToManyField(
         Genres,
         blank=True,
-        related_name='title_genre',
+        related_name='title_genres',
     )
     category = models.ForeignKey(
         Categories,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='category_title',
+        related_name='category_titles',
         db_index=False,
     )
 
     class Meta:
         ordering = ['id', ]
+        verbose_name_plural = 'Названия'
 
     def __str__(self):
         return self.name, self.description
@@ -121,6 +128,9 @@ class Review(models.Model):
         ],
     )
 
+    class Meta:
+        verbose_name_plural = 'Отзывы'
+
 
 class Comment(models.Model):
     author = models.ForeignKey(
@@ -136,6 +146,9 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации', auto_now_add=True
     )
+
+    class Meta:
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return f'{self.review} прокоментировал {self.author}'
