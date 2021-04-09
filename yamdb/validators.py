@@ -9,3 +9,4 @@ def validate_date(value):
         raise ValidationError(
             f' Вы не можете ввести давту из будующего. Ваша дата: {value}'
         )
+    return value
