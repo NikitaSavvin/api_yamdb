@@ -4,6 +4,7 @@ from django.db import models
 from pytils.translit import slugify
 
 from users.models import CustomUser
+from .validators import validate_date
 
 User = get_user_model()
 
@@ -74,7 +75,10 @@ class Titles(models.Model):
         blank=False,
         help_text='Напишите название произведения',
     )
-    year = models.PositiveSmallIntegerField(db_index=True)
+    year = models.PositiveSmallIntegerField(
+        db_index=True,
+        validators=[validate_date]
+    )
     description = models.TextField(
         help_text='описание произведения',
         null=True
@@ -82,14 +86,14 @@ class Titles(models.Model):
     genre = models.ManyToManyField(
         Genres,
         blank=True,
-        related_name='title_genre',
+        related_name='title_genres',
     )
     category = models.ForeignKey(
         Categories,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='category_title',
+        related_name='category_titles',
         db_index=False,
     )
 
