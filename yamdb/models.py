@@ -28,6 +28,7 @@ class Categories(models.Model):
 
     class Meta:
         ordering = ['name', ]
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         return self.name
@@ -44,7 +45,7 @@ class Genres(models.Model):
         help_text='Напишите название жанра'
     )
     slug = models.SlugField(
-        'Адрес страници жанра',
+        'Адрес страницы жанра',
         max_length=200,
         unique=True,
         help_text=(
@@ -55,6 +56,7 @@ class Genres(models.Model):
 
     class Meta:
         ordering = ['name', ]
+        verbose_name_plural = 'Genres'
 
     def __str__(self):
         return self.name
@@ -93,6 +95,7 @@ class Titles(models.Model):
 
     class Meta:
         ordering = ['id', ]
+        verbose_name_plural = 'Titles'
 
     def __str__(self):
         return self.name, self.description
