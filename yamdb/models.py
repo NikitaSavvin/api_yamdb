@@ -5,6 +5,8 @@ from pytils.translit import slugify
 
 from users.models import CustomUser
 
+from .validators import validate_date
+
 User = get_user_model()
 
 
@@ -78,13 +80,7 @@ class Titles(models.Model):
     )
     year = models.PositiveSmallIntegerField(
         db_index=True,
-        validators=[
-            MaxValueValidator(2025, 'Слишком отдаленная преспектива:)'),
-            MinValueValidator(
-                1880, 'В это время не было фильмов.'
-                ' Введите реальную дату:)'
-            )
-        ],
+        validators=[validate_date]
     )
     description = models.TextField(
         help_text='описание произведения',
@@ -100,13 +96,13 @@ class Titles(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='category_title',
+        related_name='category_titles',
         db_index=False,
     )
 
     class Meta:
-        verbose_name = 'Произведение'
-        verbose_name_plural = 'Произведения'
+        verbose_name = 'Названиe'
+        verbose_name_plural = 'Названия'
         ordering = ['id', ]
 
     def __str__(self):
@@ -139,7 +135,7 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
-        ordering = ['score', ]
+        ordering = ['id', ]
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'author'],
@@ -166,7 +162,6 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ['pub_date', ]
 
     def __str__(self):
         return f'{self.review} прокоментировал {self.author}'

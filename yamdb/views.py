@@ -1,30 +1,27 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import (
-    AllowAny, IsAuthenticated,
-    IsAuthenticatedOrReadOnly
-)
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import CustomUser
 from users.utils import send_mail_to_user
 
 from .filter import TitleFilter
 from .mixins import ListCreateDestroyMixin
 from .models import Categories, Genres, Review, Titles
-from .permissions import (
-    IsAdminOrReadOnly, IsAdminOrSuperUser, IsAuthorOrStaffOrReadOnly
-)
-from .serializers import (
-    CategoriesSerializer, CommentSerializer,
-    EmailSerializer, GenresSerializer, ReviewSerializer,
-    TitlesReadSerializer, TitlesWriteSerializer,
-    TokenSerializer, UserSerializer
-)
+from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
+                          IsAuthorOrStaffOrReadOnly)
+from .serializers import (CategoriesSerializer, CommentSerializer,
+                          EmailSerializer, GenresSerializer, ReviewSerializer,
+                          TitlesReadSerializer, TitlesWriteSerializer,
+                          TokenSerializer, UserSerializer)
+
+CustomUser = get_user_model()
 
 
 class CategoriesViewSet(ListCreateDestroyMixin):
@@ -126,18 +123,17 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         serializer = UserSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save(role=user.role, partial=True)
+        serializer.save(role=user.role)
         return Response(serializer.data)
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny, ])
-def RegisterView(request):
+def send_confirmation_code(request):
     serializer = EmailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    email = request.data.get('email')
-    user, create = CustomUser.objects.get_or_create(
-        email=serializer.validated_data.get('email'))
+    email = serializer.data.get('email')
+    user, create = CustomUser.objects.get_or_create(email=email)
     if create:
         user.username = serializer.validated_data.get('email')
         user.save()
@@ -145,14 +141,12 @@ def RegisterView(request):
     email_to = email
     message = f'Код подтверждения:{token}'
     send_mail_to_user(email_to, message,)
-    return Response(
-        f'Код подтверждения будет отправлен вам на почту: {user.email}'
-    )
+    return Response({'email': f'{email}'})
 
 
 @api_view(['POST'],)
 @permission_classes([AllowAny, ])
-def GetTokenView(request):
+def get_token(request):
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(CustomUser, email=serializer.validated_data.get(
@@ -161,4 +155,4 @@ def GetTokenView(request):
     if default_token_generator.check_token(user, confirmation_code):
         token = RefreshToken.for_user(user)
         return Response({'Токен': f'{token.access_token}'})
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

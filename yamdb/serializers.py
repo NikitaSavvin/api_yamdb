@@ -90,13 +90,13 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'bio',
             'role',
-            'confirmation_code',
         )
         model = CustomUser
 
-        extra_kwargs = {'confirmation_code': {'write_only': True},
-                        'username': {'required': True},
-                        'email': {'required': True}}
+        extra_kwargs = {
+            'username': {'required': True},
+            'email': {'required': True}
+        }
 
 
 class EmailSerializer(serializers.Serializer):

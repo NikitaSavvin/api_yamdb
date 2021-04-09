@@ -20,11 +20,6 @@ class CustomUser(AbstractUser):
         choices=CustomUserRole.choices,
         default=CustomUserRole.user,
     )
-    confirmation_code = models.CharField(
-        max_length=100, null=True,
-        verbose_name='Код подтверждения',
-        default=DEFAULT_UUID
-    )
     email = models.EmailField(
         max_length=255, unique=True,
         blank=False, null=False
