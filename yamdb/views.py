@@ -1,6 +1,5 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.generics import get_object_or_404
@@ -48,19 +47,17 @@ class GenresViewSet(ListCreateDestroyMixin):
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all().annotate(rating=Avg('reviews__score'))
+    permission_classes = [IsAdminOrReadOnly]
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
             return TitlesReadSerializer
         else:
             return TitlesWriteSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = TitleFilter
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    qureyset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [
         IsAuthenticatedOrReadOnly,
