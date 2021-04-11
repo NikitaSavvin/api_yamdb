@@ -1,6 +1,5 @@
 from django.core.mail import send_mail
 
-
 CONFIRMATION_CODE_LEN = 10
 
 
