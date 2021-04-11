@@ -1,6 +1,6 @@
 import django_filters
 
-from .models import Titles
+from .models import Title
 
 
 class TitleFilter(django_filters.FilterSet):
@@ -18,5 +18,5 @@ class TitleFilter(django_filters.FilterSet):
     )
 
     class Meta:
-        model = Titles
+        model = Title
         fields = ['year']

@@ -7,10 +7,10 @@ from users.models import CustomUser
 
 from .validators import validate_date
 
-User = get_user_model()
+CustomUser = get_user_model()
 
 
-class Categories(models.Model):
+class Category(models.Model):
     name = models.CharField(
         'Категория',
         max_length=200,
@@ -42,7 +42,7 @@ class Categories(models.Model):
         super().save(*args, **kwargs)
 
 
-class Genres(models.Model):
+class Genre(models.Model):
     name = models.CharField(
         max_length=200,
         help_text='Напишите название жанра'
@@ -71,7 +71,7 @@ class Genres(models.Model):
         super().save(*args, **kwargs)
 
 
-class Titles(models.Model):
+class Title(models.Model):
     name = models.CharField(
         'Название произведения',
         max_length=200,
@@ -87,16 +87,16 @@ class Titles(models.Model):
         null=True
     )
     genre = models.ManyToManyField(
-        Genres,
+        Genre,
         blank=True,
-        related_name='titles_genres',
+        related_name='titles',
     )
     category = models.ForeignKey(
-        Categories,
+        Category,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='category_titles',
+        related_name='categories',
         db_index=False,
     )
 
@@ -111,7 +111,7 @@ class Titles(models.Model):
 
 class Review(models.Model):
     title = models.ForeignKey(
-        Titles,
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews'
     )
@@ -160,6 +160,7 @@ class Comment(models.Model):
     )
 
     class Meta:
+        ordering = ['pub_date', ]
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 

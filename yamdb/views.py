@@ -13,45 +13,45 @@ from users.utils import send_mail_to_user
 
 from .filter import TitleFilter
 from .mixins import ListCreateDestroyMixin
-from .models import Categories, Genres, Review, Titles
+from .models import Category, Genre, Review, Title
 from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
                           IsAuthorOrStaffOrReadOnly)
-from .serializers import (CategoriesSerializer, CommentSerializer,
-                          EmailSerializer, GenresSerializer, ReviewSerializer,
-                          TitlesReadSerializer, TitlesWriteSerializer,
+from .serializers import (CategorySerializer, CommentSerializer,
+                          EmailSerializer, GenreSerializer, ReviewSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
                           TokenSerializer, UserSerializer)
 
 CustomUser = get_user_model()
 
 
-class CategoriesViewSet(ListCreateDestroyMixin):
-    queryset = Categories.objects.all()
-    serializer_class = CategoriesSerializer
+class CategoryViewSet(ListCreateDestroyMixin):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
     lookup_field = 'slug'
 
 
-class GenresViewSet(ListCreateDestroyMixin):
-    queryset = Genres.objects.all()
-    serializer_class = GenresSerializer
+class GenreViewSet(ListCreateDestroyMixin):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
     lookup_field = 'slug'
 
 
-class TitlesViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all().annotate(rating=Avg('reviews__score'))
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     permission_classes = [IsAdminOrReadOnly]
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
-            return TitlesReadSerializer
+            return TitleReadSerializer
         else:
-            return TitlesWriteSerializer
+            return TitleWriteSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -64,13 +64,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         data = {
             'author': self.request.user,
-            'title': get_object_or_404(Titles, pk=self.kwargs.get('title_id')),
+            'title': get_object_or_404(Title, pk=self.kwargs.get('title_id')),
         }
         return serializer.save(**data)
 
     def get_queryset(self):
         title = get_object_or_404(
-            Titles,
+            Title,
             pk=self.kwargs.get('title_id',)
         )
         all_review = title.reviews.all()
@@ -135,7 +135,7 @@ def send_confirmation_code(request):
     email = serializer.data.get('email')
     user, create = CustomUser.objects.get_or_create(email=email)
     if create:
-        user.username = serializer.validated_data.get('email')
+        user.username = email
         user.save()
     token = default_token_generator.make_token(user)
     email_to = email
@@ -149,10 +149,12 @@ def send_confirmation_code(request):
 def get_token(request):
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    user = get_object_or_404(CustomUser, email=serializer.validated_data.get(
-        'email'))
+    user = get_object_or_404(
+        CustomUser,
+        email=serializer.validated_data.get('email')
+    )
     confirmation_code = serializer.validated_data.get('confirmation_code')
     if default_token_generator.check_token(user, confirmation_code):
         token = RefreshToken.for_user(user)
-        return Response({'Токен': f'{token.access_token}'})
+        return Response({'token': f'{token.access_token}'})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
